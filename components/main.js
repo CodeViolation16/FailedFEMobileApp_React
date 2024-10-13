@@ -13,24 +13,43 @@ import {
 import React, { useState } from "react";
 import CustomModal from "./customModal";
 import Ball from "./magic8";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 export default function HomeScreen() {
   const [modalVisible, setModalVisible] = useState(false);
-  const [text, setText] = useState();
+  const [text, setText] = useState("");
+  const [display, setDisplay] = useState();
+  const [isNormalMode, setIsNormalMode] = useState(true);
+  const toggleMode = () => {
+    setIsNormalMode((prevMode) => !prevMode);
+  };
+  const [answers, setAnswers] = useState([
+    "That Would Be Insane",
+    "THAT RAW!!!",
+    "TOO GOOD!!!",
+    "it a!!!",
+  ]);
+
+  const mathRandom = () => {
+    if (text == "") {
+      return;
+    }
+
+    const random = Math.floor(Math.random() * answers.length);
+    const randomAnswer = answers[random];
+    setDisplay(randomAnswer); // Fix this to set randomAnswer
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      {/* <Button title="Normal Mode" onPressed={ } /> */}
       <View style={styles.container}>
         <Modal visible={modalVisible} transparent={true} animationType="slide">
-          <TouchableWithoutFeedback
-            onPress={() => setModalVisible((prev) => !prev)}
-          >
-            <View style={styles.ModalContainer}>
-              <TouchableWithoutFeedback>
-                <CustomModal />
-              </TouchableWithoutFeedback>
-            </View>
-          </TouchableWithoutFeedback>
+          <CustomModal
+            setModalVisible={setModalVisible}
+            answers={answers}
+            setAnswers={setAnswers} // Include setAnswers here
+          />
         </Modal>
 
         <TouchableOpacity
@@ -39,6 +58,7 @@ export default function HomeScreen() {
         >
           <Image source={require("../public/2.png")} style={styles.image} />
         </TouchableOpacity>
+
         <View style={styles.Main}>
           <Text style={styles.textHeader}>Magic 8 Ball Prediction</Text>
           <TextInput
@@ -47,8 +67,8 @@ export default function HomeScreen() {
             value={text}
             onChangeText={setText}
           />
-          <Button title="Send" />
-          <Text style={styles.textDisplay}>That's Insane</Text>
+          <Button title="Send" onPress={mathRandom} />
+          <Text style={styles.textDisplay}>{display}</Text>
         </View>
       </View>
     </SafeAreaView>
@@ -59,24 +79,24 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
   },
+  ModalContainer: {
+    width: "100%",
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   container: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     position: "relative",
-    width: "100%", // Set container to full width
+    width: "100%",
   },
 
-  ModalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
   touchable: {
     position: "absolute",
-    top: -10,
-    right: -45,
+    top: 10,
+    right: 5,
     padding: 10,
   },
   image: {
@@ -85,18 +105,20 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
   },
   Main: {
-    width: "90%", // Set Main to take 90% of the width
-    padding: 20, // Add padding to the Main container
-    alignItems: "center", // Center items horizontally
+    width: "90%",
+    padding: 20,
+    alignItems: "center",
   },
   textHeader: {
-    width: "100%", // Ensure textHeader takes full width
-    textAlign: "center", // Center align text
-    fontSize: 24, // Increase font size for better visibility
-    marginBottom: 20, // Space below the header
+    width: "100%",
+    textAlign: "center",
+    fontSize: 24,
+    marginBottom: 20,
+    color: "black",
+    fontWeight: "bold",
   },
   input: {
-    width: "100%", // Make input take full width
+    width: "75%", // Make input take full width
     padding: 10,
     borderColor: "gray",
     borderWidth: 1,

@@ -1,7 +1,8 @@
 import { StyleSheet, Text, View, TextInput, Button } from "react-native";
-import React, { useState } from "react";
-
+import React, { useState, useContext } from "react";
+import { DataContext } from "./Context";
 export default function Ball() {
+  const { data, setData } = useContext(DataContext);
   const magic8BallAnswers = [
     "It is certain.",
     "It is decidedly so.",
@@ -25,34 +26,58 @@ export default function Ball() {
     "Very doubtful.",
   ];
 
-  const [text, setText] = useState();
+  const [text, setText] = useState("");
   const [answer, setAnswer] = useState("");
+  function getFormattedDate() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = (now.getMonth() + 1).toString().padStart(2, "0");
+    const date = now.getDate().toString().padStart(2, "0");
+
+    return `${year}-${month}-${date}`;
+  }
 
   function randomizeAnswer() {
     const random = Math.floor(Math.random() * magic8BallAnswers.length);
     const answer = magic8BallAnswers[random];
     setAnswer(answer);
+    return answer;
   }
 
   const handleSend = () => {
+    if (text.trim() === "") {
+      return;
+    }
+    const date = getFormattedDate();
+    const answer = randomizeAnswer();
+    const loggedData = {
+      text,
+      answer,
+      date,
+    };
+
+    setData((prev) => [loggedData, ...prev]);
+
     setText("");
-    randomizeAnswer();
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.content}>
+        {/* <Button title="Log" /> */}
         <View style={styles.header}>
-          <Text style={styles.headerText}>Magic 8 Ball Prediction</Text>
+          <Text style={styles.headerText}>Mystic Mac Prediction</Text>
         </View>
-        <TextInput
-          style={styles.input}
-          placeholder="Type something..."
-          value={text}
-          onChangeText={setText}
-        />
+        <View style={styles.box}>
+          <TextInput
+            style={styles.input}
+            placeholder="Type something..."
+            value={text}
+            onChangeText={setText}
+          />
+          <Button title="Ask" onPress={handleSend} />
+        </View>
         <Text style={styles.textDisplay}>{answer}</Text>
-        <Button title="Send" onPress={handleSend} />
       </View>
     </View>
   );
@@ -66,16 +91,21 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   headerText: {
-    fontSize: 20,
+    fontSize: 23,
     color: "black",
     fontWeight: "bold",
   },
+  box: {
+    flexDirection: "row",
+  },
   textDisplay: {
-    width: "80%",
+    width: "65%",
+    marginTop: 20,
+    fontWeight: "bold",
+    marginRight: 10,
   },
   container: {
     flex: 1,
-    backgroundColor: "#fff",
     position: "relative",
   },
   text: {
@@ -84,23 +114,19 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   input: {
-    width: "80%",
+    width: 190,
     padding: 10,
     borderColor: "gray",
     borderWidth: 1,
     borderRadius: 8,
+    marginRight: 10,
   },
-  customText: {
-    fontSize: 20, // Font size
-    color: "black",
-    fontWeight: "bold", // Make the text bold
-    padding: 10, // Add padding around the text
-    borderRadius: 8, // Rounded corners
-  },
+
   content: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     padding: 20,
+    width: "100%",
   },
 });
